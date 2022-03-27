@@ -36,6 +36,16 @@ type DBConfig struct {
 func (server *Server) Initialize(appConfig AppConfig, dbConfig DBConfig) {
 	fmt.Println("Welcome to " + appConfig.AppName)
 
+	server.InitializeDB(dbConfig)
+	server.InitializeRoute()
+}
+
+func (server *Server) Run(addr string) {
+	fmt.Printf("Listening to port %s", addr)
+	log.Fatal(http.ListenAndServe(addr, server.Router))
+}
+
+func (server *Server) InitializeDB(dbConfig DBConfig) {
 	var err error
 
 	if dbConfig.DBDriver == "mysql" {
@@ -64,13 +74,15 @@ func (server *Server) Initialize(appConfig AppConfig, dbConfig DBConfig) {
 		panic("Failed on connecting to the database server")
 	}
 
-	server.Router = mux.NewRouter()
-	server.InitializeRoute()
-}
+	for _, model := range RegistryModels() {
+		err = server.DB.Debug().AutoMigrate(model.Model)
 
-func (server *Server) Run(addr string) {
-	fmt.Printf("Listening to port %s", addr)
-	log.Fatal(http.ListenAndServe(addr, server.Router))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	fmt.Println("Database Migration Successfully")
 }
 
 func Run() {
@@ -78,7 +90,7 @@ func Run() {
 	var appConfig = AppConfig{}
 	var dbConfig = DBConfig{}
 
-	err := godotenv.Load()
+	err := godotenv.Load("local.env")
 	if err != nil {
 		log.Fatal("Error on Load .env File")
 	}
