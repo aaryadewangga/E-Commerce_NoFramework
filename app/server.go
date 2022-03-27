@@ -18,6 +18,7 @@ func (server *Server) Initialize() {
 	fmt.Println("Welcome to MyToko")
 
 	server.Router = mux.NewRouter()
+	server.InitializeRoute()
 }
 
 func (server *Server) Run(addr string) {
