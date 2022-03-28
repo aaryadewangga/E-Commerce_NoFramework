@@ -1,6 +1,7 @@
 package app
 
 import (
+	"P2/database/seeders"
 	"fmt"
 	"log"
 	"net/http"
@@ -38,6 +39,7 @@ func (server *Server) Initialize(appConfig AppConfig, dbConfig DBConfig) {
 
 	server.InitializeDB(dbConfig)
 	server.InitializeRoute()
+	seeders.DBSeed(server.DB)
 }
 
 func (server *Server) Run(addr string) {
