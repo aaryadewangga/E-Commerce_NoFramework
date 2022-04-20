@@ -11,7 +11,7 @@ func (server *Server) InitializeRoute() {
 	server.Router = mux.NewRouter()
 	server.Router.HandleFunc("/", controllers.Home).Methods("GET")
 
-	staticFileDirectory := http.Dir("./assets/")
+	staticFileDirectory := http.Dir("app/assets/")
 	staticFileHandler := http.StripPrefix("/public/", http.FileServer(staticFileDirectory))
 	server.Router.PathPrefix("/public/").Handler(staticFileHandler).Methods("GET")
 }
